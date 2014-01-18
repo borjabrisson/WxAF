@@ -1,0 +1,215 @@
+
+--  ######################################				STORE PROCEDURE			##########################################
+
+delimiter $$
+
+drop procedure if exists CheckCredentials$$
+create procedure CheckCredentials()
+begin
+	declare iuserID integer;
+	select SystemID into iuserID from Users where userID = substring_index(user(),'@',1);
+
+	select 0 as error, concat("agosal_user_",iuserID) as userDB;
+end$$
+
+select "SP Judges" as step $$
+
+--  ######################################				Jueces			##########################################
+drop procedure if exists new_Judge$$
+create procedure new_Judge(
+	in iName varchar(28),
+	in iSurnames varchar(20)
+)
+begin
+	insert into Judges (Name,Surnames) values (iName,iSurnames);
+	select 0 as error;
+end$$
+
+drop procedure if exists edit_Judge$$
+create procedure edit_Judge(
+	in iJudgeCode integer unsigned,
+	in iName varchar(28),
+	in iSurnames varchar(20)
+)
+begin
+	update Judges set Name=iName,Surnames=iSurnames where JudgeCode=iJudgeCode;
+	select 0 as error;
+end$$
+
+drop procedure if exists delete_Judge$$
+create procedure delete_Judge(
+	in iJudgeCode integer unsigned
+)
+begin
+	delete from Judges where JudgeCode=iJudgeCode ;
+	select 0 as error;
+end$$
+
+--  ######################################				Secretarios			##########################################
+
+drop procedure if exists new_Secretary$$
+create procedure new_Secretary(
+	in iName varchar(28),
+	in iSurnames varchar(20)
+)
+begin
+	insert into Secretaries (Name,Surnames) values (iName,iSurnames);
+	select 0 as error;
+end$$
+
+drop procedure if exists edit_Secretary$$
+create procedure edit_Secretary(
+	in iSecretaryCode integer unsigned,
+	in iName varchar(28),
+	in iSurnames varchar(20)
+)
+begin
+	update Secretaries set Name=iName,Surnames=iSurnames where SecretaryCode=iSecretaryCode;
+	select 0 as error;
+end$$
+
+drop procedure if exists delete_Secretary$$
+create procedure delete_Secretary(
+	in iSecretaryCode integer unsigned
+)
+begin
+	delete from Secretaries where SecretaryCode=iSecretaryCode ;
+	select 0 as error;
+end$$
+
+--  ######################################				Tipos Generales: CourtsType . Comunity			##########################################
+
+drop procedure if exists new_courtsType$$
+create procedure new_courtsType(
+	in iID varchar(5),
+	in idescripcion varchar(20)
+)
+begin
+	insert into courtsType(Type,descripcion) values (iID,idescripcion);
+	select 0 as error;
+end$$
+
+drop procedure if exists new_judgmentType$$
+create procedure new_judgmentType(
+	in iID varchar(5),
+	in idescripcion varchar(20)
+)
+begin
+	insert into judgmentType(Type,descripcion) values (iID,idescripcion);
+	select 0 as error;
+end$$
+
+
+drop procedure if exists new_Community$$
+create procedure new_Community(
+	in iID varchar(5),
+	in idescripcion varchar(20)
+)
+begin
+	insert into Community(ID,descripcion) values (iID,idescripcion);
+	select 0 as error;
+end$$
+
+drop procedure if exists edit_Community$$
+create procedure edit_Community(
+	in iID varchar(5),
+	in idescripcion varchar(20),
+	in ilastID varchar(5)
+)
+begin
+	update Community set ID =iID,descripcion=idescripcion where ID=ilastID ;
+	select 0 as error;
+end$$
+
+drop procedure if exists delete_Community$$
+create procedure delete_Community(
+	in iID varchar(5)
+)
+begin
+	delete from Community where ID=iID;
+	select 0 as error;
+end$$
+
+
+drop procedure if exists new_UserSystem$$
+create procedure new_UserSystem(
+	in iuserID varchar(15),
+	in iName varchar(20),
+	in iSurnames varchar(25),
+	in iGender enum("H","M"),
+	in iEmail varchar(20),
+	in iCommunity varchar(5)
+)
+begin
+	insert into Users(userID,Name,Surnames,Gender,Email,Community) values (iuserID,iName,iSurnames,iGender,iEmail,iCommunity);
+	select 0 as error;
+end$$
+
+
+--  ######################################				Juzgados		##########################################
+
+-- Revisar si el tipo de juzgado es correcto: FK
+-- la comunidad existe : FK
+-- que el juez y el secretario no se repitan: OK.
+drop procedure if exists new_Courts$$
+create procedure new_Courts(
+	in iJudgeCode integer unsigned,
+	in iSecretaryCode integer unsigned,
+	in iAddress varchar (40),
+	in iType varchar(10),
+	in iCommunity varchar(5)
+)
+begin
+	declare secretaryUnique integer;
+	declare judgeUnique integer;
+	
+	select SecretaryCode into secretaryUnique from Courts where SecretaryCode = iSecretaryCode limit 1;
+	select JudgeCode into judgeUnique from Courts where JudgeCode = iJudgeCode limit 1;
+	
+	if (secretaryUnique is null) and (judgeUnique is null) then
+		insert into Courts (JudgeCode,SecretaryCode,Address,Type,Community) values (iJudgeCode,iSecretaryCode,iAddress,iType,iCommunity);
+		select 0 as error;
+	else
+		select 1 as error,"Cuidado, se ha insertado un secretario o juez ya asociado. Juez:$_judge,Sec:$_secretary" as msg,
+						iJudgeCode as judge,iSecretaryCode as secretary;
+	end if;
+	
+end$$
+
+drop procedure if exists edit_Courts$$
+create procedure edit_Courts(
+	in iCourtCode integer unsigned,
+	in iJudgeCode integer unsigned,
+	in iSecretaryCode integer unsigned,
+	in iAddress varchar (40),
+	in iType varchar(10),
+	in iCommunity varchar(5)
+)
+begin
+	declare secretaryUnique integer;
+	declare judgeUnique integer;
+	
+	select SecretaryCode into secretaryUnique from Courts where CourtCode<>iCourtCode and SecretaryCode = iSecretaryCode limit 1;
+	select JudgeCode into judgeUnique from Courts where CourtCode<>iCourtCode and JudgeCode = iJudgeCode limit 1;
+	
+	if (secretaryUnique is null) or (judgeUnique is null) then
+		select 1 as error,"Cuidado, se ha insertado un secretario o juez ya asociado. Juez:$_judge,Sec:$_secretary" as msg,
+						iJudgeCode as judge,iSecretaryCode as secretary;
+	else
+		update Courts set JudgeCode=iJudgeCode,SecretaryCode=iSecretaryCode,Address=iAddress,Type=iType,Community=iCommunity where CourtCode=iCourtCode;
+		select 0 as error;
+	end if;
+	
+end$$
+
+
+drop procedure if exists delete_Courts$$
+create procedure delete_Courts(
+	in iCourtCode integer unsigned
+)
+begin
+	delete from Courts where CourtCode = iCourtCode;
+	select 0 as error;
+end$$
+
+delimiter ;

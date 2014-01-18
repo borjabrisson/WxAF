@@ -1,0 +1,90 @@
+include build/window/general.gcc
+include build/linux-config.gcc
+
+
+all: prueba mensajeria calendario contactos
+clean:
+	if [ "$$(ls ${Build} | grep -F .o )" ]; then rm ${Build}/*.o; fi
+	if [ "$$(ls ${Build} | grep -F .d )" ]; then rm ${Build}/*.d; fi
+
+	
+######################################################################
+####				Modulo: Pruebas								########
+######################################################################
+	
+prueba: pruebaPanel.o procedPanel.o facturaPop.o myCtr.o
+
+pruebaPanel.o: ${Ag_Spec}/pruebaPanel.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+procedPanel.o: ${Ag_Spec}/procedPanel.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+facturaPop.o: ${Ag_Spec}/facturaPop.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+myCtr.o: ${Ag_Spec}/myCtr.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Mensajeria							########
+######################################################################
+	
+mensajeria: MensajeriaCtr.o MensajeriaPage.o MensajeriaCard.o MensajeriaFilter.o
+
+MensajeriaCtr.o: ${Ag_Spec}/mensajes/MensajeriaCtr.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+MensajeriaPage.o: ${Ag_Spec}/mensajes/MensajeriaPage.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+MensajeriaCard.o: ${Ag_Spec}/mensajes/MensajeriaCard.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+MensajeriaFilter.o: ${Ag_Spec}/mensajes/MensajeriaFilter.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Calendario							########
+######################################################################
+	
+calendario: CalendarioPage.o CalendarioCard.o CalendarioCtr.o
+
+CalendarioPage.o: ${Ag_Spec}/calendario/CalendarioPage.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+CalendarioCard.o: ${Ag_Spec}/calendario/CalendarioCard.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+CalendarioCtr.o: ${Ag_Spec}/calendario/CalendarioCtr.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Contactos							########
+######################################################################
+	
+contactos: ContactosCtr.o ContactosPage.o PeopleContactCard.o CompanyContactCard.o
+
+ContactosCtr.o: ${Ag_Spec}/contactos/ContactosCtr.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+ContactosPage.o: ${Ag_Spec}/contactos/ContactosPage.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+PeopleContactCard.o: ${Ag_Spec}/contactos/PeopleContactCard.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+CompanyContactCard.o: ${Ag_Spec}/contactos/CompanyContactCard.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+#MensajeriaFilter.o: ${Ag_Spec}/contactos/MensajeriaFilter.cpp
+#	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+
+
+
+
+

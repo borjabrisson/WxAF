@@ -1,0 +1,10 @@
+CC = g++
+CPPFLAGS = -std=gnu++11 -O0 -g3 -Wall -c -fmessage-length=0  -MMD -MP
+MODULOS = ventana.o gestion.o bd.o juego
+wxFALGS = `wx-config --cxxflags --libs`
+MySQLFLAGS = `mysql_config --cflags --libs`
+Build=build
+Ag_Base=base
+Ag_Controller=controladores
+Ag_SGBD=conector
+Ag_Spec=general

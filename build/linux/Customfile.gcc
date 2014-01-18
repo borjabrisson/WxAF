@@ -1,0 +1,88 @@
+include ./build/linux-config.gcc
+
+all: prueba mensajeria calendario contactos
+clean:
+	if [ "$$(ls ${Build} | grep -F .o )" ]; then rm ${Build}/*.o; fi
+	if [ "$$(ls ${Build} | grep -F .d )" ]; then rm ${Build}/*.d; fi
+
+	
+######################################################################
+####				Modulo: Pruebas								########
+######################################################################
+	
+prueba: pruebaPanel.o
+
+pruebaPanel.o: ${Ag_Spec}/pruebaPanel.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+procedPanel.o: ${Ag_Spec}/procedPanel.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+facturaPop.o: ${Ag_Spec}/facturaPop.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+myCtr.o: ${Ag_Spec}/myCtr.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Mensajeria							########
+######################################################################
+	
+mensajeria: MensajeriaCtr.o MensajeriaPage.o MensajeriaCard.o MensajeriaFilter.o
+
+MensajeriaCtr.o: ${Ag_Spec}/mensajes/MensajeriaCtr.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+	
+MensajeriaPage.o: ${Ag_Spec}/mensajes/MensajeriaPage.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+MensajeriaCard.o: ${Ag_Spec}/mensajes/MensajeriaCard.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+MensajeriaFilter.o: ${Ag_Spec}/mensajes/MensajeriaFilter.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Calendario							########
+######################################################################
+	
+calendario: CalendarioPage.o CalendarioCard.o CalendarioCtr.o
+
+CalendarioPage.o: ${Ag_Spec}/calendario/CalendarioPage.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+CalendarioCard.o: ${Ag_Spec}/calendario/CalendarioCard.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+CalendarioCtr.o: ${Ag_Spec}/calendario/CalendarioCtr.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+	
+
+######################################################################
+####				Modulo: Contactos							########
+######################################################################
+	
+contactos: ContactosCtr.o ContactosPage.o PeopleContactCard.o CompanyContactCard.o
+
+ContactosCtr.o: ${Ag_Spec}/contactos/ContactosCtr.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+ContactosPage.o: ${Ag_Spec}/contactos/ContactosPage.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+PeopleContactCard.o: ${Ag_Spec}/contactos/PeopleContactCard.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+CompanyContactCard.o: ${Ag_Spec}/contactos/CompanyContactCard.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+MensajeriaFilter.o: ${Ag_Spec}/contactos/MensajeriaFilter.cpp
+	g++   ${wxFALGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP ${MySQLFLAGS} -o ${Build}/$@ $<
+
+
+
+
+
+

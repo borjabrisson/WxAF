@@ -1,0 +1,109 @@
+include build/window/general.gcc
+include build/linux-config.gcc
+
+all: conectorSGBD controllers base
+
+clean:
+	if [ "$$(ls ${Build} | grep -F .o )" ]; then rm ${Build}/*.o; fi
+	if [ "$$(ls ${Build} | grep -F .d )" ]; then rm ${Build}/*.d; fi
+
+
+######################################################################
+####				Modulo: Controllers							########
+######################################################################
+	
+controllers: parser.o ctrBase.o query.o Customcomunicate.o
+
+parser.o: ${Ag_Controller}/parser.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+ctrBase.o: ${Ag_Controller}/ctrBase.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+query.o: ${Ag_Controller}/query.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+Customcomunicate.o: ${Ag_Controller}/Customcomunicate.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+######################################################################
+####				Modulo: base 								########
+######################################################################
+	
+base:  dialog mygrid.o timer.o
+
+timer.o: ${Ag_Base}/timer.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+mygrid.o: ${Ag_Base}/mygrid.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+######################################################################
+####				Modulo: APP 								########
+######################################################################
+
+app: skeletonApp.o baseApp.o
+
+skeletonApp.o: ${Ag_Base}/skeletonApp.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+baseApp.o: ${Ag_Base}/baseApp.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+######################################################################
+####				Modulo: Panel 								########
+######################################################################
+
+panel: app basePanel.o mypanel.o panelBaseGrid.o panelGrid.o panelCustomer.o panelCalendar.o
+
+basePanel.o: ${Ag_Base}/basePanel.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+mypanel.o: ${Ag_Base}/mypanel.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+panelBaseGrid.o: ${Ag_Base}/panelBaseGrid.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+panelGrid.o: ${Ag_Base}/panelGrid.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+panelCustomer.o: ${Ag_Base}/panelCustomer.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+panelCalendar.o: ${Ag_Base}/panelCalendar.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+	
+######################################################################
+####				Modulo: Dialog 								########
+######################################################################
+	
+dialog: panel DialogBase.o lookupbox.o popup.o
+
+DialogBase.o: ${Ag_Base}/DialogBase.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+lookupbox.o: ${Ag_Base}/lookupbox.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+popup.o: ${Ag_Base}/popup.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+
+######################################################################
+####				Modulo: Conector SGBD: MYSQL				########
+######################################################################
+	
+conectorSGBD: sgbd_baseConector.o sgbd_conector.o
+
+sgbd_baseConector.o: ${Ag_SGBD}/sgbd_baseConector.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+	
+sgbd_conector.o: ${Ag_SGBD}/sgbd_conector.cpp
+	g++    ${wxAF_CXXFLAGS} ${CPPFLAGS} -MT${Build}/$@ -MF${Build}/$@.d -MD -MP  -o ${Build}/$@ $<
+
+	
+
+
+

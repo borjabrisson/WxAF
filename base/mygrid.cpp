@@ -49,7 +49,7 @@ void MyGrid::resetData(){
 }
 
 
-int MyGrid::MysetRow(int pos,map<string,string> row){
+int MyGrid::MysetRow(unsigned int pos,map<string,string> row){
 	map<string,string>::iterator it;
 	int ind=0;
 	for ( it=row.begin() ; it != row.end(); ind++,it++ ){
@@ -59,7 +59,7 @@ int MyGrid::MysetRow(int pos,map<string,string> row){
 	return 0;
 }
 
-int MyGrid::MyinsertRow(int pos, map<string,string> row){
+int MyGrid::MyinsertRow(unsigned int pos, map<string,string> row){
 // 	bool 	InsertRows (int pos=0, int numRows=1, bool updateLabels=true)
 	this->InsertRows(pos);
 	this->MysetRow(pos,row);
@@ -78,41 +78,36 @@ int MyGrid::MyappendRow(map<string,string> row){
 int MyGrid::pushDataSet(dataset data){
 	int pos = 0;
 	dataset::iterator it;
-	
 	for ( it=data.begin() ; it != data.end(); pos++,it++ ){
 		this->MyappendRow((*it));
 	}
+	this->currentDataset = data;
 	return pos;
 }
 
 
-map<string,string> MyGrid::MygetRow(int pos){
-	map<string,int>::iterator it;
-	map<string,string> out;
-	wxString value;
-	string str;
-	for ( it=this->components.begin() ; it != this->components.end(); it++ ){
-		value = this->GetCellValue(pos,(*it).second);
-		str = (const char*)value.mb_str();
-		out.insert(pair<string,string>((*it).first, str));
+map<string,string> MyGrid::MygetRow(unsigned int pos){
+	dataset::iterator it;
+	map<string,string> out ;
+	if (pos < this->currentDataset.size()){
+		unsigned int ind=0;
+		for (it = this->currentDataset.begin(); ind < pos; ind++,it++);
+		out = (*it);
 	}
 	return out;
 }
 
-map<string,string> MyGrid::MygetItemsRow(int pos,list<string> items){
+map<string,string> MyGrid::MygetItemsRow(unsigned int pos,list<string> items){
 	list<string>::iterator it;
-	map<string,string> out;
-	wxString value;
-	string str;
+	map<string,string> out, row;
+	row = MygetRow(pos);
 	for ( it=items.begin() ; it != items.end(); it++ ){
-		value = this->GetCellValue(pos,this->components[(*it)]);
-		str = (const char*)value.mb_str();
-		out.insert(pair<string,string>( *it , str));
+		out.insert(pair<string,string>( *it , row[(*it)]));
 	}
 	return out;	
 }
 
-void MyGrid::setColourRow(int row,const wxColour &colour){
+void MyGrid::setColourRow(unsigned int row,const wxColour &colour){
 	if (row >= 0){
 		wxGridCellAttr *attr = new wxGridCellAttr(this->GetOrCreateCellAttr(row,1));
 	// 	attr->SetBackgroundColour(wxColour(135,206,235)); //sky blue
@@ -121,7 +116,7 @@ void MyGrid::setColourRow(int row,const wxColour &colour){
 	}
 }
 
-void MyGrid::setColourRow(int row,unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha){
+void MyGrid::setColourRow(unsigned int row,unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha){
 	this->setColourRow(row,wxColour(red,green,blue,alpha));
 }
 

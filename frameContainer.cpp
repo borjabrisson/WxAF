@@ -41,3 +41,13 @@ void frameContainer::RefreshData(){
 		(*it).second->Reload();
 	}
 }
+
+void frameContainer::OnFilter(wxCommandEvent& event){
+	myPanel *obj = (myPanel *)this->note->GetCurrentPage();
+	obj->OnFilter();
+}
+
+
+void frameContainer::OnRefresh(wxCommandEvent& event){
+	this->RefreshData();
+}

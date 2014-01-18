@@ -16,10 +16,10 @@ void panelBaseGrid::handleGridEvent(wxGridEvent& event){
 				this->OnLeftClick(event);
 			break;
 		case EVT_GRID_CELL_LEFT_DCLICK:
-				this->OnRightClick(event);
+				this->OnLeftDbClick(event);
 			break;
 		case EVT_GRID_CELL_RIGHT_CLICK:
-				this->OnLeftDbClick(event);
+				this->OnRightClick(event);
 			break;
 		case EVT_GRID_CELL_RIGHT_DCLICK:
 				this->OnRightDbClick(event);

@@ -3,11 +3,13 @@
 #include <wx/wx.h>
 
 #include <wx/button.h>
-// #include <wx/frame.h>
 
 #include <wx/string.h>
-// #include <wx/object.h> 
 #include <wx/textctrl.h>
+#include <wx/datectrl.h>
+#include <wx/checkbox.h>
+#include <wx/combobox.h>
+#include <wx/radiobox.h>
 
 // #include <wx/panel.h>
 #include <wx/sizer.h>
@@ -15,8 +17,6 @@
 #include <wx/statbox.h>
 
 #include "mygrid.h"
-
-
 
 #include <wx/gbsizer.h>
 #include <wx/sizer.h>
@@ -28,74 +28,53 @@
 #include <string>
 #include <list>
 
+#include <wx/listctrl.h>
+
 #include "DialogBase.h"
+
+#ifdef wxVersion2_9
+	#include <wx/timectrl.h>
+#endif
 
 using namespace std;
 
 class MyLookUpBox : public wxPanel
 {
 protected:
-	typedef struct itemCard_struct{
-		wxTextCtrl*		input;
-		wxButton*	btn;
-		bool lookup;
-	}itemCard;
-	
-	map<string,itemCard> inputs;
-	map<int,string> lookup;
-	map<string,string> labels;
-	
-	wxPanel *panel;
-
+	map<int,wxDateTime::Month> mounthCode;
+	map<int,string> actionsEnable;
 	MyGrid *grid;
 	
-	int labelSize;
-	int InputSize;
-	int heightRow;
-
-	wxButton* acept;
-	wxButton* cancel;
-	
-	wxGridBagSizer* BagGrig;
-	wxGridBagSizer* BagCard;
+	int labelSize, InputSize, heightRow, btnActionSize;
+	wxGridBagSizer *BagGrid, *BagCard;
 
 	string mode;
 	DialogBase *parent;
 public:
 	MyLookUpBox(wxWindow *parent);
-	
 	~MyLookUpBox();
 	
-	int AddComponent(string id,string label, bool lookup=false);
-	wxButton* GetLookup(string id);
-	
-	void OnClick(wxCommandEvent& event);
-	
-	int BuildBox(int widthBox=300 , int heightBox=300);
-	
+	int BuildBox(map<string, itemCard> &inputs,map<int, string> &lookupBtn,list<string> &orderItem,list<string> &actions,int widthBox=300 , int heightBox=300);
 	int SetWidth(string type="label", int width=50);
-	
-	void GetSize(int &widthBox,int  &heightBox);
+
 	int ChangeMode();
 
-	void SetParentEvent(DialogBase *parent);
+	void setValue(int type,wxControl *obj, string value);
+	string getValue(int type,wxControl *obj);
 
-	map<string,string> getInputsValue();
+	void SetModeList();
+	void SetModeCard();
+	string getActionsID(int btnID);
 
-	void setValue(string id, string value);
-// 	int Hide();
-// 	int Show();
-// 	virtual void OnLoad();
 protected:
-	typedef map<string,string> row_type;
-	typedef list<row_type> dataset;
-
-	void OnAcept(wxCommandEvent& event);
-	void OnCancel(wxCommandEvent& event);
-
-	int BuildCardBox();
-	
 	int BuildListBox(int widthBox, int heightBox);
+	int BuildCardBox(map<string, itemCard> &inputs,map<int, string> &lookupBtn,list<string> &orderItem,list<string> &actions);
+
+	wxGridBagSizer* CreateCardRow(wxStaticText* label,wxControl* input,wxButton* lookup);
+	wxGridBagSizer* createSizerActions(list<string> &actions);
+
+	wxControl* createInputCard(int type,int maxSize);
+	wxStaticText* createLabelInput(string label);
 };
 
 #endif /* MyLookUpBox_H_ */

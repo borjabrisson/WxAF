@@ -34,27 +34,31 @@ using namespace std;
 class MyPopup : public  DialogBase
 {
 	
-public:
+protected:
 	MyLookUpBox *box;
 	myPanel *parent;
+	map<string,string> getInputsValue();
 public:
+
 	MyPopup();
 	~MyPopup();
 
 	int SetGrid(map<string,string> components);
-	
+	void Login();
 	int ShowGrid();
 	
-	int BuildPop(myPanel *parent);
-	
+	int BuildPop(myPanel *parent,string tittle="");
 	virtual int ChangeMode(bool lookup=false);
-	void OnClick(wxCommandEvent& event);
 
 	void HandleEvent(string action);
 	
 	virtual void createAction();
 
 	void setValues(map<string,string> values);
+
+protected:
+	bool checkInputsValue();
+	void OnEventClick(wxCommandEvent& event);
 };
 
 #endif /* PopUp_H_ */

@@ -89,29 +89,19 @@ void ctrBase::setConector(sgbd_baseConector *conector){
 }
 
 
-list<field_type>  ctrBase::select(query clause){
-	string select, from, where, order, out;
-	
-	select = "Select "+ this->clauseSelect(clause.getFields()) + "\n";
-	from = "From "+ this->clauseFrom(clause.getTables()) + "\n";
-	out = this->clauseWhere(clause.getFilters());
-	
-	if (out != "")	where = "Where "+ out  + "\n";
-// 	else where
-	out = this->clauseOrder(clause.getOrder());
-	if(out != "")	order = "Order by " +  out + "\n";
-
-	list<field_type> record;
-	this->conector->query("test",select + from + where + order,record);
-
-	#ifdef DEBUG_OUT
-		translate_paint(record);
-	#endif
-		
-	push_Debug(select + from + where + order);
-	return record;	
+string ctrBase::getClauseWhere(map<string,string> &filter){
+	string where="",block="",sep="";
+	map<string,string>::iterator it;
+	for(it =filter.begin();it!= filter.end(); it++){
+		block = this->filterParser.filter((*it).first,(*it).second);
+		if (block != ""){
+			where += sep+"("+block+")";
+			block = "";
+			sep = " and ";
+		}
+	}
+	return where;
 }
-
 
 string ctrBase::messageProcedure(){
 	return this->conector->msgLastProcedure();
@@ -188,3 +178,93 @@ bool ctrBase::sendAction(string idFrame,int action, map<string,string> data, map
 	return this->conector->procedure("test","call prueba(\"121\",\"554\",\"0\");");
 }
 
+field_type ctrBase::filter(string idFrame,int type,map<string,string> &filter){
+	field_type data;
+	switch (type) {
+	case Agosal_Base_Action::ACT_getFilter:
+		data = this->filterObj;
+		break;
+	case Agosal_Base_Action::ACT_setFilter:
+		map<string, string>::iterator it;
+		for (it = filter.begin(); it != filter.end(); it++) {
+			this->filterObj[(*it).first] = (*it).second;
+		}
+		buildFilterString();
+		break;
+	}
+	return data;
+}
+
+
+/** ################################################################################################################
+ * 					Nuevo protocolo de comunicacion
+ *  ################################################################################################################*/
+
+
+Customcomunicate ctrBase::createMsgblock(int action) {
+	Customcomunicate obj;
+	obj.actionID = action;
+	return obj;
+}
+
+Customcomunicate ctrBase::ActionRequest(Customcomunicate block) {
+	cout << "ActionRequest!!!!: "<< block.actionID << endl;
+	Customcomunicate obj;
+	switch (block.type){
+	case BKCM_Action:
+		obj =  HandleActions(block);
+		break;
+	case BKCM_Query:
+		obj =  HandleQuery(block);
+			break;
+	case BKCM_Filter:
+		obj =  HandleFilter(block);
+			break;
+	default:
+		obj =  createMsgblock(-1);
+		break;
+	}
+
+	if ( (block.data != NULL) && (block.data != obj.data) )
+		delete block.data;
+	if ( (block.dataset != NULL) && (block.dataset != obj.dataset) )
+		delete block.dataset;
+
+	return obj;
+
+}
+
+Customcomunicate ctrBase::HandleActions(Customcomunicate block) {
+	return createMsgblock(C2V_actionOK);
+}
+
+Customcomunicate ctrBase::HandleQuery(Customcomunicate block) {
+	return createMsgblock(C2V_actionOK);
+}
+
+Customcomunicate ctrBase::HandleFilter(Customcomunicate block) {
+	return createMsgblock(C2V_actionOK);
+}
+
+string ctrBase::buildArgsString(string args[], int size,map<string, string> &data) {
+	string argsString ="",value,sep="";
+	for(int i; i< size;i++){
+		if(data.count(args[i]) == 0){ // No existe el campo indicado.
+			return "";
+		}else{
+			value = data[args[i]];
+			if (value == ""){
+				argsString = sep+"null";
+			}
+			else{
+				argsString = sep+value;
+			}
+			sep =",";
+		}
+	}
+	return argsString;
+}
+
+void ctrBase::buildFilterString(){
+	filterString = getClauseWhere(this->filterObj);
+}

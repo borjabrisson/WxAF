@@ -17,6 +17,7 @@ class sgbd_conector : public sgbd_baseConector {
 public:	
 	sgbd_conector();
 	int setCredentials(string user,string pass);
+	void clearCredential();
 
 };
 //	g++ -I/usr/include/mysql -O0 -g3 -Wall -DBIG_JOINS=1  -fno-strict-aliasing  -g -c -fmessage-length=0 -MMD -MP -MF"main.d" -MT"main.d" -L '/usr/lib/i386-linux-gnu' -lmysqlclient -lpthread -lz -lm -lrt -ldl -o "main.o" "main.cpp"

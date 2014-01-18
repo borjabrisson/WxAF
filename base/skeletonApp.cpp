@@ -22,3 +22,8 @@ list<field_type> skeletonApp::select(string idFrame,int type,map<string,string> 
 	list<field_type> data;
 	return data;
 }
+
+field_type skeletonApp::filter(string idFrame,int type,map<string,string> &filter){
+	map<string, string> data;
+	return data;
+}

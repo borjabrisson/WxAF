@@ -13,8 +13,8 @@
 using namespace std;
 
 
-#define ERROR_OUT 
-// #define DEBUG_OUT
+#define ERROR_OUT
+#define DEBUG_OUT
 
 inline void push_Error(string msg){
 	#ifdef ERROR_OUT
@@ -23,6 +23,12 @@ inline void push_Error(string msg){
 }
 
 inline void push_Debug(string msg){
+	#ifdef DEBUG_OUT
+		cout << "DEBUG: "<<msg << endl;
+	#endif
+}
+
+inline void push_test(stringstream msg){
 	#ifdef DEBUG_OUT
 		cout << "DEBUG: "<<msg << endl;
 	#endif
@@ -38,7 +44,7 @@ typedef struct structItemHeaderColumn{
 #define SGBD_USER_DEFAULT ""
 #define SGBD_PASS_DEFAULT ""
 #define SGBD_HOST_DEFAULT "127.0.0.1"
-#define SGBD_DB_DEFAULT "test"
+#define SGBD_DB_DEFAULT "agosal2"
 
 #define Enable_login 70000
 #define Enable_autoRefresh 20000
@@ -47,8 +53,10 @@ typedef struct structItemHeaderColumn{
 
 #define wxDateToString(date)  (date.FormatISODate()).utf8_str()
 
-#define wxStringToStdString(str)  str.utf8_str()
+#define wxStringToStdString(WXstr)  WXstr.utf8_str()
 
+#define StdStringTowxString(str)  wxString(str.c_str(), wxConvUTF8)
 
+#define DIR_CERT "/etc/mysql/cert/ca-cert.pem"
 
 #endif /* CONFIG_H_ */

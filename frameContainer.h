@@ -29,6 +29,10 @@ public:
     frameContainer(const wxString& title, const wxPoint& pos, const wxSize& size);
     virtual void OnQuit(wxCommandEvent& event){}
     virtual void OnAbout(wxCommandEvent& event){}
+
+    void OnFilter(wxCommandEvent& event);
+    void OnRefresh(wxCommandEvent& event);
+
 	virtual void OnClick(wxCommandEvent& event){}
 	virtual void buildFrame(){}
 	virtual void RefreshData();
@@ -40,7 +44,11 @@ protected:
 
 	void addPage(string id,string tab, myPanel *page);
 	virtual void Init();
-
+	void addMenu(wxMenu * menu, string title){
+		int pos = menuBar->GetMenuCount();
+		menuBar->Insert(pos,menu,StdStringTowxString(title));
+		menuBar->Refresh();
+	}
 
 // 	wxToolBar* ToolBar1;
 // 	wxStatusBar* StatusBar1;

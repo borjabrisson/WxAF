@@ -45,13 +45,14 @@ public:
 // 	bool procedure(string bd,string procedure,list<string> values);
 	string getMsgError(string idFrame);
 	
-	virtual list<field_type>  select(query clause){return this->ctr->select(clause);}
-
 	virtual list<field_type> select(string idFrame,int type,map<string,string> filter);
 // 	virtual list<field_type>  select(string idFrame,query clause){return this->ctr->select(clause);}
 
 
 	bool sendAction(string idFrame,int action, map<string,string> data, map<string,string> key);
+	map<string,string> filter(string idFrame,int type,map<string,string> &filter);
+
+	Customcomunicate sendAction(Customcomunicate block);
 
 	virtual void wakeUp(int action);
 };

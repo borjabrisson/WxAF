@@ -43,13 +43,14 @@ class MyGrid : public wxGrid
 {
 	
 protected:
-	map<string,int> components;
+	map<string,int> components; // Asocia el ID de cada columna con su posición dentro del grid
+	dataset currentDataset; // Contiene el dataset utilizado actualmente.
 public:
 	MyGrid(wxWindow *parent, wxWindowID id, list<itemHeaderColumn> components,const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
 			   long style=wxWANTS_CHARS, const wxString &name=wxGridNameStr);
 	//GetNumberCols
-	int MysetRow(int pos,map<string,string> row);
-	int MyinsertRow(int pos, map<string,string> row);
+	int MysetRow(unsigned int pos,map<string,string> row);
+	int MyinsertRow(unsigned int pos, map<string,string> row);
 	int MyappendRow(map<string,string> row);
 
 	int pushDataSet(dataset data);
@@ -59,12 +60,12 @@ public:
 	void resetGrid();
 	void resetData();
 
-	void setColourRow(int row,const wxColour &colour);
-	void setColourRow(int row,unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha=wxALPHA_OPAQUE);
+	void setColourRow(unsigned int row,const wxColour &colour);
+	void setColourRow(unsigned int row,unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha=wxALPHA_OPAQUE);
 	
 // Nos permiten acceder a la información de la fila pos. También nos permite seleccionar elementos específicos de esa fila.	
-	map<string,string> MygetRow(int pos);
-	map<string,string> MygetItemsRow(int pos,list<string> items);
+	map<string,string> MygetRow(unsigned int pos);
+	map<string,string> MygetItemsRow(unsigned int pos,list<string> items);
 };
 
 #endif /* MY_GRID_H_ */

@@ -21,6 +21,7 @@
 #include <wx/gbsizer.h>
 
 #include "../controladores/ctrBase.h"
+#include "../controladores/Customcomunicate.h"
 #include "../controladores/query.h"
 #include "../conector/sgbd_conector.h"
 
@@ -51,13 +52,18 @@ public:
 	virtual bool procedure(string bd,string procedure,list<string> values){return true;}
 	virtual string getMsgError(string idFrame);
 	
-	virtual list<field_type>  select(query clause){return this->ctr->select(clause);}
 	virtual list<field_type> select(string idFrame,int type,map<string,string> filter);
 
 	// 	virtual list<field_type>  select(string idFrame,query clause){return this->ctr->select(clause);}
 
 	virtual bool sendAction(string idFrame,int action, map<string,string> data, map<string,string> key);
+	virtual field_type filter(string idFrame,int type,map<string,string> &filter);
 	string attr;
+
+	virtual Customcomunicate sendAction(Customcomunicate block){
+		Customcomunicate a;
+		return a;
+	}
 
 	virtual void wakeUp(int action){}
 };

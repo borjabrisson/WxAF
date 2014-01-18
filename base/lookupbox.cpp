@@ -1,84 +1,38 @@
-// hworld.cpp
-// Version using dynamic event routing
-// http://docs.wxwidgets.org/trunk/group__group__funcmacro__events.html
 #include "lookupbox.h"
-// #include "hello-wx2.cpp"
 
-MyLookUpBox::MyLookUpBox(wxWindow *parent): wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize){
+MyLookUpBox::MyLookUpBox(wxWindow *parent) : // Lo ideal seria tener una funcion para crear las acciones (botones) y un handler de sus clicks
+		wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize) {
 	this->labelSize = 100;
-	this->InputSize= 100;
-	this->heightRow= 30;
-	
+	this->InputSize = 100;
+	this->heightRow = 30;
+	this->btnActionSize = 100;
+
 	this->mode = "card";
+	this->parent = (DialogBase *) parent;
 
-	this->acept = new wxButton(this, wxNewId(), _("Aceptar"), wxDefaultPosition,  wxSize(this->InputSize,this->heightRow));
-	this->cancel = new wxButton(this, wxNewId(), _("Cancelar"), wxDefaultPosition,  wxSize(this->InputSize,this->heightRow));
+	mounthCode[1] = wxDateTime::Month::Jan;
+	mounthCode[2] = wxDateTime::Month::Feb;
+	mounthCode[3] = wxDateTime::Month::Mar;
+	mounthCode[4] = wxDateTime::Month::Apr;
+	mounthCode[5] = wxDateTime::Month::May;
+	mounthCode[6] = wxDateTime::Month::Jun;
 
+	mounthCode[7] = wxDateTime::Month::Jul;
+	mounthCode[8] = wxDateTime::Month::Aug;
+	mounthCode[9] = wxDateTime::Month::Sep;
+	mounthCode[10] = wxDateTime::Month::Oct;
+	mounthCode[11] = wxDateTime::Month::Nov;
+	mounthCode[12] = wxDateTime::Month::Dec;
 
-	this->Connect(this->acept->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,  wxCommandEventHandler(MyLookUpBox::OnAcept) );
-	this->Connect(this->cancel->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,  wxCommandEventHandler(MyLookUpBox::OnCancel) );
 }
 
-MyLookUpBox::~MyLookUpBox(){
-	if (this->panel != NULL) delete this->panel;
+MyLookUpBox::~MyLookUpBox() { // Posiblemente no sea necesario su eliminacio, por lo que parece se borran solos.
 }
 
-int MyLookUpBox::AddComponent(string id,string label, bool lookup){
-	this->labels.insert(pair<string,string>(id,label));
+int MyLookUpBox::ChangeMode() {
 
-	itemCard item;
-	item.input = NULL;//new wxTextCtrl(this,wxNewId(),_T(""),wxPoint(this->labelSize,this->heightRow), wxSize(this->InputSize,this->heightRow));
-	item.btn = NULL;
-	item.lookup = false;
-	if(lookup){
-		item.lookup = true;
-// 		item.btn =  new wxButton(this, wxNewId(), _("#"), wxPoint(this->labelSize+this->InputSize,this->heightRow),  wxSize(this->heightRow,this->heightRow));
-// 		this->lookup.insert(pair<int,string>(item.btn->GetId(),id));
-	}
-	this->inputs.insert(pair<string,itemCard>(id,item));
-	
-	return 0;
-}
-
-wxButton* MyLookUpBox::GetLookup(string id){
-	if(this->inputs[id].btn != NULL){
-		return this->inputs[id].btn;
-	}
-	return NULL;
-}
-
-
-
-void MyLookUpBox::GetSize(int &widthBox,int  &heightBox){
-	if (this->mode != "lookup"){
-		widthBox = this->labelSize + 2*this->InputSize;
-		if (this->lookup.size()!=0){
-			widthBox += this->heightRow;
-		}
-		heightBox = (this->labels.size()+4)*this->heightRow;
-	}
-	else{
-		widthBox = 600;
-		heightBox = 400;
-	}
-}
-
-int MyLookUpBox::ChangeMode(){
-	
-	if(this->mode == "lookup"){
-		this->mode = "card";
-
-		this->parent->ChangeMode(false);
-
-		this->SetSizer(this->BagCard,false);
-
-		
-		this->BagGrig->ShowItems(false);
-		this->BagCard->ShowItems(true);
-		
-		this->BagCard->Fit(this);
-		this->BagCard->SetSizeHints(this);
-	
+	if (this->mode == "lookup") {
+		SetModeCard();
 		return 1;
 	}
 	// Se encuentra en el modo card
@@ -86,210 +40,284 @@ int MyLookUpBox::ChangeMode(){
 
 	this->parent->ChangeMode(true);
 
-	this->SetSizer(this->BagGrig,false);
+	this->SetSizer(this->BagGrid, false);
 
 	this->BagCard->ShowItems(false);
-	this->BagGrig->ShowItems(true);
-	
-	this->BagGrig->Fit(this);
-	this->BagGrig->SetSizeHints(this);
-	
-	
-	
+	this->BagGrid->ShowItems(true);
+
+	this->BagGrid->Fit(this);
+	this->BagGrid->SetSizeHints(this);
+
 	return 2;
-	
+
 }
 
-int MyLookUpBox::BuildBox(int widthBox , int heightBox){
-	
-// 	this->pop= new MyPopup(parent, wxID_ANY,_T("Emergenteee"),wxDefaultPosition,wxSize(widthBox,heightBox), wxDEFAULT_DIALOG_STYLE  |  wxRESIZE_BORDER);
-	
-	this->BuildCardBox();
- 	this->BuildListBox(widthBox,heightBox);
+void MyLookUpBox::SetModeList() {
 
+}
+
+void MyLookUpBox::SetModeCard() {
+	this->mode = "card";
+	this->parent->ChangeMode(false);
+
+	this->SetSizer(this->BagCard, false);
+
+	this->BagGrid->ShowItems(false);
 	this->BagCard->ShowItems(true);
-	
-	// asignamos el grid perteneciente al modo card y ocultamos los items del modo lista.
 
-// 	this->SetSizer(this->BagCard);
-// 	this->BagCard->Fit(this);
-// 	this->BagCard->SetSizeHints(this);
-	
-	
-//  	new wxButton(this->panel, wxNewId(), _("#"),  wxPoint(widthBox-(widthBox/2),heightBox-50),  wxSize(this->heightRow,this->heightRow));
-
-
-	return 0;
-}
-
-int MyLookUpBox::BuildCardBox(){
-	
-	this->BagCard = new wxGridBagSizer();
-
-	this->SetSizer(this->BagCard);
 	this->BagCard->Fit(this);
 	this->BagCard->SetSizeHints(this);
-	
-	this->BagCard->Add(this->InputSize/2,30, wxGBPosition(0, 0),wxGBSpan(1, 1));		this->BagCard->Add(this->InputSize/2,30, wxGBPosition(0, 2),wxGBSpan(1, 1));
-	
-	wxBoxSizer *boxH;// = new wxBoxSizer(wxHORIZONTAL);
+}
 
-	wxStaticText *tag;
-	map<string,string>::iterator it;
-	int ind=1;
+int MyLookUpBox::BuildBox(map<string, itemCard> &inputs,
+		map<int, string> &lookupBtn, list<string> &orderItem,
+		list<string> &actions, int widthBox, int heightBox) {
 
-	for ( it=this->labels.begin() ; it != this->labels.end(); ind++,it++ ){
-		boxH = new wxBoxSizer(wxHORIZONTAL);
-		tag = new  wxStaticText (this, wxID_ANY, wxString( (*it).second.c_str(), wxConvUTF8), wxDefaultPosition, wxSize(this->labelSize,this->heightRow));
-		boxH->Add(tag);
-		
-		this->inputs[(*it).first].input = new wxTextCtrl(this,wxNewId(),_T(""),wxDefaultPosition, wxSize(this->InputSize,this->heightRow));//,wxTE_PASSWORD);
-		boxH->Add(this->inputs[(*it).first].input);
-		
-		if(this->inputs[(*it).first].lookup){
-			this->inputs[(*it).first].btn =  new wxButton(this, wxNewId(), _("#"), wxDefaultPosition,  wxSize(this->heightRow,this->heightRow));
+	this->BuildCardBox(inputs, lookupBtn, orderItem, actions);
+//	this->BuildListBox(widthBox, heightBox);
 
-			this->lookup.insert(pair<int,string>(this->inputs[(*it).first].btn->GetId(),(*it).first));
-
-			boxH->Add(this->inputs[(*it).first].btn);
-			this->Connect(this->inputs[(*it).first].btn->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,  wxCommandEventHandler(MyLookUpBox::OnClick) );
-		}
-		else{
-			boxH->Add(new  wxStaticText (this, wxID_ANY,  _(" "), wxDefaultPosition, wxSize(this->heightRow,this->heightRow)));
-// 			boxH->AddSpacer(10);
-		}
-
-		this->BagCard->Add(boxH, wxGBPosition(ind, 1), wxGBSpan(1, 1),	wxGROW);
+	//this->BagCard->ShowItems(true);
+	if (this->mode == "card") {
+		this->BagCard->ShowItems(true);
+		this->parent->SetSize(this->BagCard->GetSize());
+	} else {
+		this->BagGrid->ShowItems(true);
+		this->parent->SetSize(this->BagGrid->GetSize());
 	}
-	this->BagCard->Add(100,30, wxGBPosition(ind, 1),wxGBSpan(1, 1),	wxGROW);
-	boxH = new wxBoxSizer(wxHORIZONTAL);
-	boxH->Add(this->acept);					boxH->Add(new  wxStaticText (this, wxID_ANY,  _(" "), wxDefaultPosition, wxSize(this->heightRow,this->heightRow)));
-	boxH->Add(this->cancel);
-
-	this->BagCard->Add(boxH, wxGBPosition(ind+1, 1),wxGBSpan(1, 1),	wxGROW);
-	this->BagCard->Add(100,30, wxGBPosition(ind+2, 1),wxGBSpan(1, 1),	wxGROW);
-	
-	this->BagCard->AddGrowableRow(0);this->BagCard->AddGrowableCol(1);
-// 	this->BagCard->Add(box, wxGBPosition(0, 0), wxGBSpan(1, 1),	wxGROW);
+	// asignamos el grid perteneciente al modo card y ocultamos los items del modo lista.
 	return 0;
 }
 
-int MyLookUpBox::BuildListBox(int widthBox, int heightBox){
+int MyLookUpBox::BuildCardBox(map<string, itemCard> &inputs,
+		map<int, string> &lookupBtn, list<string> &orderItem,
+		list<string> &actions) {
+	this->BagCard = new wxGridBagSizer();
 
-// 	wxStaticBoxSizer *boxgrid = new wxStaticBoxSizer(wxVERTICAL,this->panel,_T("PEPE"));
-	
+	this->SetSizer(this->BagCard); // ??
+
+	this->BagCard->Add(this->InputSize / 2, 30, wxGBPosition(0, 0),
+			wxGBSpan(1, 1), wxGROW);
+	this->BagCard->Add(this->InputSize / 2, 30, wxGBPosition(0, 2),
+			wxGBSpan(1, 1), wxGROW);
+
+	itemCard item;
+	list<string>::iterator it;
+	int ind = 1;
+	wxGridBagSizer *boxH; // = new wxBoxSizer(wxHORIZONTAL);
+	wxStaticText *tag;
+	wxButton* btn;
+	for (it = orderItem.begin(); it != orderItem.end(); ind++, it++) {
+		item = inputs[(*it)];
+		item.input = createInputCard(item.type, item.maxSize);
+		tag = createLabelInput(item.label);
+
+		if (item.lookup) {
+			btn = new wxButton(this, wxNewId(), _("#"), wxDefaultPosition,
+					wxSize(this->heightRow, this->heightRow));
+			lookupBtn[btn->GetId()] = (*it);
+			item.btn = btn;
+		} else {
+			btn = NULL;
+		}
+		boxH = this->CreateCardRow(tag, item.input, btn);
+		this->BagCard->Add(boxH, wxGBPosition(ind, 1), wxGBSpan(1, 1), wxGROW);
+		inputs[(*it)] = item;
+	}
+	//this->BagCard->AddGrowableRow(0);
+	// Creamos el area de las acciones.
+	boxH = createSizerActions(actions);
+	this->BagCard->Add(boxH, wxGBPosition(ind + 1, 1), wxGBSpan(1, 1), wxGROW);
+	this->BagCard->Add(100, 30, wxGBPosition(ind + 2, 1), wxGBSpan(1, 1),
+			wxGROW);
+
+	this->BagCard->AddGrowableCol(1);
+
+	this->BagCard->Fit(this);
+	this->BagCard->SetSizeHints(this);
+	return 0;
+}
+
+wxStaticText* MyLookUpBox::createLabelInput(string label) {
+	return new wxStaticText(this, wxID_ANY, wxString(label.c_str(), wxConvUTF8),
+			wxDefaultPosition, wxSize(this->labelSize, this->heightRow));
+}
+
+wxControl* MyLookUpBox::createInputCard(int type, int maxSize) {
+	wxControl* input;
+	switch (type) {
+	case textInput:
+	case timeInput:
+		input = new wxTextCtrl(this, wxNewId(), _T(""), wxDefaultPosition,
+				wxSize(this->InputSize, this->heightRow)); //,wxTE_PASSWORD);
+		((wxTextCtrl*) input)->SetMaxLength(maxSize);
+		break;
+	case textAreaInput:
+		input = new wxTextCtrl(this, wxNewId(), _T(""), wxDefaultPosition,
+				wxSize(this->InputSize, this->heightRow * 7),
+				wxHSCROLL | wxTE_MULTILINE); //,wxTE_PASSWORD);
+		((wxTextCtrl*) input)->SetMaxLength(maxSize);
+		break;
+	case dateInput:
+		input = new wxDatePickerCtrl(this, wxNewId(), wxDefaultDateTime,
+				wxDefaultPosition, wxSize(this->InputSize, this->heightRow));
+		break;
+	case booleanInput:
+		input = new wxCheckBox(this, wxNewId(),
+				StdStringTowxString(((string)"")), wxDefaultPosition,
+				wxSize(this->InputSize, this->heightRow), wxALIGN_RIGHT);
+		break;
+	case optionInput:
+		break;
+	default:
+		push_Error("MyLookUpBox::AddComponent. Tipo de input inválido ");
+		return NULL;
+		break;
+	}
+	return input;
+}
+
+wxGridBagSizer* MyLookUpBox::CreateCardRow(wxStaticText* label,
+		wxControl* input, wxButton* lookup) {
+
+	wxGridBagSizer* boxH = new wxGridBagSizer();
+
+	boxH->Add(label, wxGBPosition(0, 0), wxGBSpan(1, 1));
+	boxH->Add(input, wxGBPosition(0, 1), wxGBSpan(1, 1), wxGROW);
+
+	if (lookup != NULL) {
+		boxH->Add(lookup, wxGBPosition(0, 2), wxGBSpan(1, 1));
+		this->Connect(lookup->GetId(), wxEVT_COMMAND_BUTTON_CLICKED,
+				wxCommandEventHandler(DialogBase::OnLookUpBtn));
+	} else {
+		boxH->Add(
+				new wxStaticText(this, wxID_ANY, _(" "), wxDefaultPosition,
+						wxSize(this->heightRow, this->heightRow)),
+				wxGBPosition(0, 2), wxGBSpan(1, 1));
+		// 			boxH->AddSpacer(10);
+	}
+	boxH->AddGrowableCol(1, 1);
+	return boxH;
+}
+
+wxGridBagSizer* MyLookUpBox::createSizerActions(list<string> &actions) {
+	list<string>::iterator it;
+	int ind = 0;
+	wxButton *btn;
+	wxGridBagSizer *box = new wxGridBagSizer();
+	for (it = actions.begin(); it != actions.end(); it++, ind++) {
+		btn = new wxButton(this, wxNewId(), StdStringTowxString((*it)),
+				wxDefaultPosition, wxSize(btnActionSize, heightRow));
+		this->actionsEnable[btn->GetId()] = (*it);
+		box->Add(btn, wxGBPosition(0, ind), wxGBSpan(1, 1), wxGROW);
+		box->AddGrowableCol(ind);
+		this->parent->Connect(btn->GetId(), wxEVT_COMMAND_BUTTON_CLICKED,wxCommandEventHandler(DialogBase::OnEventClick));
+	}
+	return box;
+}
+
+int MyLookUpBox::BuildListBox(int widthBox, int heightBox) {
+
 	list<itemHeaderColumn> cols;
-// 	cols.insert(pair<string,string>("first","Primeró"));
-// 	cols.insert(pair<string,string>("second","segundño"));
-// 	cols.insert(pair<string,string>("third","segundo"));
-// 
-// 	map<string,string> row;
-// 	row.insert(pair<string,string>("first","Valor"));
-// 	row.insert(pair<string,string>("third","Valor 3"));
-	
-	this->BagGrig = new wxGridBagSizer();
-	this->BagGrig->Fit(this);
-	this->BagGrig->SetSizeHints(this);
-// 	this->SetSizer(this->BagGrig,false);
-	
+
+	this->BagGrid = new wxGridBagSizer();
+	this->BagGrid->Fit(this); //this->BagGrid->SetSizeHints(this);
+// 	this->SetSizer(this->BagGrid,false);
 
 	this->grid = new MyGrid(this, wxID_ANY, cols); /*	this->grid->Show();*/
 
-// 	this->grid->MyappendRow(row);
-// 	row["first"] = "2";
-// 	this->grid->MyappendRow(row);
-// 	row["first"] = "3";
-// 	this->grid->MyappendRow(row);
-	
 // 	this->grid = new wxGrid(this, wxID_ANY,wxDefaultPosition,wxDefaultSize);
-	
-	this->BagGrig->Add(this->grid, wxGBPosition(0, 0), wxGBSpan(3, 3),wxGROW);
 
+	this->BagGrid->Add(this->grid, wxGBPosition(0, 0), wxGBSpan(3, 3), wxGROW);
 
 	wxBoxSizer* boxH = new wxBoxSizer(wxHORIZONTAL);
-	boxH->Add(new  wxStaticText (this, wxID_ANY,  _(" "), wxDefaultPosition, wxSize(200,this->heightRow)));
-	boxH->Add(this->acept);
-	boxH->Add(new  wxStaticText (this, wxID_ANY,  _(" "), wxDefaultPosition, wxSize(this->heightRow,this->heightRow)));
-	boxH->Add(this->cancel);
+	boxH->Add(
+			new wxStaticText(this, wxID_ANY, _(" "), wxDefaultPosition,
+					wxSize(200, this->heightRow)));
 
-	this->BagGrig->Add(boxH, wxGBPosition(3, 1));
-	this->BagGrig->AddGrowableRow(0);	this->BagGrig->AddGrowableCol(2);
+	//##! Sizer especifico para los botones de aceptar y cancelar
+	/*boxH->Add(this->acept);
+	 boxH->Add(
+	 new wxStaticText(this, wxID_ANY, _(" "), wxDefaultPosition,
+	 wxSize(this->heightRow, this->heightRow)));
 
-	this->BagGrig->ShowItems(false);
+	 boxH->Add(this->cancel);
+
+	 this->BagGrid->Add(boxH, wxGBPosition(3, 1));*/
+	this->BagGrid->AddGrowableRow(0);
+	this->BagGrid->AddGrowableCol(2);
+
+	this->BagGrid->ShowItems(false);
 
 	return 0;
 }
 
-void MyLookUpBox::OnClick(wxCommandEvent& event){
-	cout << this->lookup[event.GetId()] << endl;
-	cout << "On clik!!" << endl;
-	list<itemHeaderColumn> headers;
-	list<row_type> dataset;
-	dataset = this->parent->getLookupQuery(this->lookup[event.GetId()],headers);
-	
-	this->grid->pushHeaders(headers);
-	this->grid->pushDataSet(dataset);
-	this->ChangeMode();
-}
-
-void MyLookUpBox::OnCancel(wxCommandEvent& event){
-	cout << "Cancelt!!" << endl;
-
-	if (this->mode == "lookup") 	this->ChangeMode();
-	else this->parent->HandleEvent("cancel");
-}
-
-void MyLookUpBox::OnAcept(wxCommandEvent& event){
-	cout << "Acept!!" << endl;
-	if (this->mode == "lookup"){
-		
-		cout << this->grid->GetSelectedRows().GetCount() << endl;
-		wxArrayInt array;
-		array = this->grid->GetSelectedRows();
-		int size = array.GetCount();
-		if ((size>0)  && (size<2)){
-			cout << "Fila seleccionada: " << array[0] << endl;
-			map<string,string> temp;
-			temp = this->grid->MygetRow(array[0]);
-			cout << "Valor del primero en ese caso: " << temp["first"] << endl;
-			this->parent->setValues(temp);
-			this->ChangeMode();
-		}
-		else{
-			string msg;
-			if (size == 0) msg = "Seleccione un elemento";
-			else		   msg = "No puede seleccionar más de un elemento";
-			wxMessageBox(  wxString( msg.c_str(), wxConvUTF8),_("Atención"),      wxOK|wxICON_INFORMATION, this );
-		}
+string MyLookUpBox::getValue(int type, wxControl *obj) {
+	string value;
+	switch (type) {
+	case textInput:
+	case textAreaInput: {
+		wxString wxValue = ((wxTextCtrl *) obj)->GetValue();
+		value = (const char*) wxValue.mb_str();
 	}
-	else this->parent->HandleEvent("acept");
-}
-
-map<string,string> MyLookUpBox::getInputsValue(){
-	map<string,string> out;
-	map<string,itemCard>::iterator it;
-	wxString value;
-	string str;
-	for(it=this->inputs.begin(); it != this->inputs.end(); it++){
-		value = (*it).second.input->GetValue();
-		str = (const char*)value.mb_str();
-		out.insert(pair<string,string>((*it).first, str));
+		break;
+	case dateInput: {
+		wxDateTime date = ((wxDatePickerCtrl *) obj)->GetValue();
+		value = date.FormatISODate().utf8_str();
 	}
-	return out;	
-}
-
-void MyLookUpBox::setValue(string id, string value){
-	if(this->inputs.count(id) > 0){
-		this->inputs[id].input->SetValue( wxString( value.c_str(), wxConvUTF8));
+		break;
+	case timeInput:
+#ifdef wxVersion2_9
+#endif
+		break;
+	case booleanInput:
+	case optionInput:
+		break;
 	}
+	return value;
 }
 
+void MyLookUpBox::setValue(int type, wxControl *obj, string value) {
+	switch (type) {
+	case textInput:
+	case textAreaInput:
+		((wxTextCtrl *) obj)->SetValue(
+				StdStringTowxString(value));
+		break;
+	case dateInput: {
+		wxDateTime date;
+		if (date.ParseDate(StdStringTowxString(value))) {
+			int day, month, year, prevSeparator, nextSeparator = value.find("-");
 
-int MyLookUpBox::SetWidth(string type, int width){
-	return 0;
+			year = atoi(value.substr(0, nextSeparator).c_str());
+			prevSeparator = nextSeparator;
+			nextSeparator = value.find("-", prevSeparator + 1);
+
+			month = atoi(
+					value.substr(prevSeparator + 1,
+							nextSeparator - (prevSeparator + 1)).c_str());
+			day = atoi(value.substr(nextSeparator + 1).c_str());
+			// Debido a fallos/deficiiencias en la libreria WxWidgets1.8 nos vemos obligados a usar esta alternativa
+			date.SetDay(day);
+			date.SetMonth(mounthCode[month]);
+			date.SetYear(year);
+			((wxDatePickerCtrl *) obj)->SetValue(date); //wxDateTime(day,month,year));
+		} else
+			push_Error(
+					" MyLookUpBox::setValue. Valor incorrecto para DateTime: "
+							+ value);
+	}
+		break;
+	case timeInput:
+#ifdef wxVersion2_9
+#endif
+		break;
+	case booleanInput:
+	case optionInput:
+		break;
+	}
+	return;
 }
 
-
-void MyLookUpBox::SetParentEvent(DialogBase *parent){
-	this->parent = parent;
+string MyLookUpBox::getActionsID(int btnID){
+	return this->actionsEnable[btnID];
 }

@@ -16,11 +16,11 @@ sgbd_baseConector::sgbd_baseConector() {
 	this->username = SGBD_USER_DEFAULT;
 	this->pass = SGBD_PASS_DEFAULT;
 	this->host = SGBD_HOST_DEFAULT;
-	this->db = SGBD_DB_DEFAULT;
+	this->generalDB = SGBD_DB_DEFAULT;
 	this->port = MYSQL_PORT;
-	
+	this->userDB = "";
 }
-
+/*
 int sgbd_baseConector::conect(string db){
 	if(!(this->myData = mysql_init(0))){
 	   // Imposible crear el objeto myData
@@ -28,8 +28,29 @@ int sgbd_baseConector::conect(string db){
 	   this->msgSP = mysql_error(this->myData);
 	   return 1;
 	}
-	if (db == "") db = this->db;
+	if (db == "") db = this->generalDB;
+	mysql_ssl_set(this->myData, NULL, NULL, "/etc/mysql/cert/ca-cert.pem", NULL, NULL);
 	if(!mysql_real_connect(this->myData, this->host.c_str(), this->username.c_str(),this->pass.c_str(),db.c_str(),this->port, NULL, 0)){		  
+		// No se puede estabñecer la conexión con el servidor.
+		push_Error("\nsgbd_baseConector::Conect.\n No se ha podido crear la conexion:\n Error:"+(string)mysql_error(this->myData) );
+		this->msgSP = mysql_error(this->myData);
+		this->desconect();
+		return 1;
+	}
+	push_Debug("Conexion correcta!!!");
+	return 0;
+}
+*/
+int sgbd_baseConector::conect(string db){
+	if(!(this->myData = mysql_init(0))){
+	   // Imposible crear el objeto myData
+	   push_Error("\nsgbd_baseConector::Conect.\n Imposible crear el objeto myData:: " + (string)mysql_error(this->myData) );
+	   this->msgSP = mysql_error(this->myData);
+	   return 1;
+	}
+	if (db == "") db = this->generalDB;
+	mysql_ssl_set(this->myData, NULL, NULL, DIR_CERT, NULL, NULL);
+	if(!mysql_real_connect(this->myData, this->host.c_str(), this->username.c_str(),this->pass.c_str(),db.c_str(),this->port, NULL, 0)){
 		// No se puede estabñecer la conexión con el servidor.
 		push_Error("\nsgbd_baseConector::Conect.\n No se ha podido crear la conexion:\n Error:"+(string)mysql_error(this->myData) );
 		this->msgSP = mysql_error(this->myData);
@@ -38,6 +59,7 @@ int sgbd_baseConector::conect(string db){
 	}
 	return 0;
 }
+
 
 int sgbd_baseConector::desconect(){
 	if(this->myData != NULL ){
@@ -85,15 +107,16 @@ int sgbd_baseConector::procedure(string db, string clause){
 	if(mysql_query(this->myData, clause.c_str())) {
 		// Error al realizar la consulta:
 		push_Error("SGBD:Procedure. ERROR: "+(string)mysql_error(this->myData));
+		push_Error("SGBD:Sentencia: "+ clause);
 		this->msgSP = mysql_error(this->myData);
 // 		this->rollback();
 		this->desconect();
 		return 0;//2
 	}
-	map<string,string> data = this->resultSP();
+	this->msgBlock = this->resultSP();
 	int ret = 1;
-	if (data.count("error") != 0){
-		if (data["error"] == "0")
+	if (this->msgBlock.count("error") != 0){
+		if (this->msgBlock["error"] == "0")
 			this->commit();
 		else{
 			this->rollback();
@@ -106,7 +129,7 @@ int sgbd_baseConector::procedure(string db, string clause){
 		ret = 0;
 	}
 
-	this->setMessage(data);	
+	this->setMessage(this->msgBlock);
 
 	this->desconect();
 	return ret;
@@ -145,10 +168,15 @@ map<string,string> sgbd_baseConector::get_row(MYSQL_ROW &row,MYSQL_RES *res){
 	fields = mysql_fetch_fields(res);
 	nFields = mysql_num_fields(res);
 	
-	push_Debug("numero de campos "+ nFields );
-	for (int ind_field =0; ind_field < nFields; ind_field++ ){
-		data.insert(pair<string,string>(fields[ind_field].name,row[ind_field]));
-		push_Debug("SGB:resultSP: Campo: "+(string)fields[ind_field].name+" Valor: " + (string)row[ind_field]);
+	for (int ind_field = 0; ind_field < nFields; ind_field++) {
+		if (NULL != row[ind_field]) {
+			push_Debug("SGB:resultSP: Campo: " + (string) fields[ind_field].name+ " Valor: " + (string) row[ind_field]);
+			data.insert(pair<string, string>(fields[ind_field].name,row[ind_field]));
+
+		} else {
+			push_Debug("SGB:resultSP: Campo: " + (string) fields[ind_field].name+ " Valor: 'Nulo'");
+			data.insert(pair<string, string>(fields[ind_field].name, ""));
+		}
 	}
 
 	return data;
@@ -169,5 +197,7 @@ bool sgbd_baseConector::rollback(){
 	return false;
 }
 
-
+map<string,string> sgbd_baseConector::getmsgBlock(){
+	return msgBlock;
+}
 

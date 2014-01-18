@@ -1,10 +1,7 @@
 
 #include "mypanel.h"
 
-myPanel::myPanel(wxWindow *parent,string id): wxPanel(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize){
-
-	this->id = id;
-
+myPanel::myPanel(wxWindow *parent,string id): basePanel(parent,id){
 // 	&this->app =  wxGetApp();
 }
 
@@ -39,12 +36,12 @@ void myPanel::addAction(int id, string caption){
 	this->Connect(btn->GetId(),wxEVT_COMMAND_BUTTON_CLICKED,  wxCommandEventHandler(myPanel::OnClickActionButton) );
 }
 
+void myPanel::addAction(int id, wxControl* obj) {
+	this->buttons.insert(pair<int,wxControl*>(id,obj));
+	this->actions.insert(pair<int,int>(obj->GetId(),id));
+};
+
 void myPanel::BuildPage(){} // Realizará la construcción específica del panel utilizado.
-
-void  myPanel::setApp(skeletonApp *app){
-	this->app = app;
-}
-
 
 void myPanel::Reload(){} // Recargará los datos obteneidos por la consulta construida en el objeto QUERY.
 
@@ -54,12 +51,23 @@ void myPanel::actionsHandler(int action){
 }
 
 void myPanel::completeActionsHandler(map<string,string>data){
-// 	cout << "completeActionsHandler. Accion activa: " << this->curAction << endl;
+// 	cout << "myPanel::completeActionsHandler. Accion activa: " << this->curAction << endl;
 	if(this->sendAction(this->curAction,data,data)) this->Reload();
 	else{
 		this->showMessage("Error",this->getMsgError());
 	}
 }
+
+wxGridBagSizer* myPanel::buildActionSizer() {
+	wxGridBagSizer *bag =new wxGridBagSizer();
+	map<int, wxControl*>::iterator it;
+	int ind = 1;
+	for (it = this->buttons.begin(); it != this->buttons.end(); ind++, it++) {
+		bag->Add((*it).second, wxGBPosition(ind, 0));
+	}
+	return bag;
+}
+
 
 void myPanel::OnClickActionButton(wxCommandEvent& event){
 	this->curAction = this->actions[event.GetId()];
@@ -74,23 +82,28 @@ bool myPanel::sendAction(int action, map<string,string> data,map<string,string> 
 	return this->app->sendAction(this->id,action,data,key);
 }
 
+map<string,string> myPanel::getFilter(){
+	map<string,string> data;
+	return this->app->filter(this->id,Agosal_Base_Action::ACT_getFilter,data);
+}
+
+void myPanel::setFilter(map<string,string> &data){
+	this->app->filter(this->id,Agosal_Base_Action::ACT_setFilter,data);
+}
+
 
 void myPanel::replayAction(string action,map<string,string>data){
-	if ((action== "acept") && (this->curAction != -1) )
-	{
+//	cout << "myPanel::replayAction. Accion activa: " << this->curAction << endl;
+	if (this->curAction == Agosal_Base_Action::ACT_onFilter){
+		this->setFilter(data);
+		return;
+	}
+	if (this->curAction != -1){
 		this->completeActionsHandler(data);
-// 		this->showMessage("Entramos bien!!","Alertilla!!!!");
-		
-		/*bool exit = this->app->sendAction(this->id,this->curAction,data,this->curItem);
-		string msg = this->app->getMsgError() + "-- Respiesta: ";
-		if (exit == 1) msg += "Exito";
-		else msg += "Fracaso";
-		wxMessageBox(  wxString( msg.c_str(), wxConvUTF8),_("Atención"),   wxOK|wxICON_INFORMATION, this );*/
 	}
 	this->curAction = -1;
 	this->curItem.clear();	
 
-	
 } // Captará la respuesta del objeto popup lanzado.
 
 

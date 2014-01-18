@@ -18,6 +18,7 @@ void panelCalendar::Init(){
 
 void panelCalendar::handleCalendarEvent(wxCalendarEvent& event){
 	wxDateTime date = event.GetDate();
+	cout << "Fechaaaa  "<<date.FormatISODate().utf8_str()<< endl;
 	cout << "Entrooo: " << event.GetEventType() << " ::: "<< endl;
 	switch (event.GetEventType()){
 		case EVT_SEL_CHANGED:
@@ -102,12 +103,11 @@ void panelCalendar::BuildPage(){
 	
 	if (this->gridBagSizer == NULL){
 		this->gridBagSizer = new wxGridBagSizer();
-		this->actionBag = new wxGridBagSizer(); // Podría utilizarse un sizerBox en lugar de un gridBag...
 		this->SetSizer(this->gridBagSizer);
+
 		this->calendar = new wxCalendarCtrl (this, wxNewId(),wxDefaultDateTime,wxDefaultPosition,wxDefaultSize,wxCAL_SHOW_HOLIDAYS | wxCAL_MONDAY_FIRST,wxCalendarNameStr);
 
 // 		this->picker = new wxDatePickerCtrl  (this, wxNewId(),wxDefaultDateTime,wxDefaultPosition,wxDefaultSize,wxDP_DEFAULT|wxDP_SHOWCENTURY);
-
 // 		this->noteList = new MyGrid(this, wxNewId(),wxDefaultPosition,wxDefaultSize);//,wxLC_LIST | wxLC_SORT_ASCENDING | wxLC_HRULES | wxLC_VRULES);
 
 		list<itemHeaderColumn> temp = headerGrid();//= this->headerGrid();
@@ -119,6 +119,7 @@ void panelCalendar::BuildPage(){
 // 		this->gridBagSizer->Add(this->picker, wxGBPosition(0, 0), wxGBSpan(1, 2),wxGROW);
 
 		this->loadCalendarConfig();
+		this->actionBag = buildActionSizer(); // Podría utilizarse un sizerBox en lugar de un gridBag...
 		
 		this->gridBagSizer->Add(this->calendar, wxGBPosition(0, 0), wxGBSpan(1, 2),wxGROW);
 		
@@ -129,12 +130,11 @@ void panelCalendar::BuildPage(){
 	this->gridBagSizer->Fit(this);
 	this->gridBagSizer->SetSizeHints(this);
 
-	map<int,wxButton*>::iterator it;
-	int ind =1;
-	for ( it=this->buttons.begin() ; it != this->buttons.end();ind++, it++ ){
-		this->actionBag->Add((*it).second, wxGBPosition(ind, 0));
-	}
-
+//	map<int,wxButton*>::iterator it;
+//	int ind =1;
+//	for ( it=this->buttons.begin() ; it != this->buttons.end();ind++, it++ ){
+//		this->actionBag->Add((*it).second, wxGBPosition(ind, 0));
+//	}
 
 	this->gridBagSizer->AddGrowableRow(1);this->gridBagSizer->AddGrowableCol(1);
 }

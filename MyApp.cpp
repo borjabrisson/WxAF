@@ -24,8 +24,12 @@ void MyApp::loadControllers(){
 	setController(MensajeriaCtr,"MensajeriaCtr");
 	setControllerPage("MensajeriaCtr","mensajes");
 
+	setController(ContactosCtr,"ContactosCtr");
+	setControllerPage("ContactosCtr","contactos");
+
 	this->ctrContainer["CalendarioCtr"]->setConector(this->conector);
 	this->ctrContainer["MensajeriaCtr"]->setConector(this->conector);
+	this->ctrContainer["ContactosCtr"]->setConector(this->conector);
 }
 
 
@@ -58,8 +62,18 @@ void MyFrame::buildFrame(){
     menuFile->AppendSeparator();
     menuFile->Append( ID_Quit, _T("E&xit") );
 
-    this->menuBar->Append(menuFile, _T("&File") );
+//    addMenu(menuFile, "&File" );
 
+    wxMenu* menuEdit = new wxMenu;
+
+    menuEdit->Append( ID_Filtro, _T("Filtrar"));
+    menuEdit->AppendSeparator();
+    menuEdit->Append( ID_Buscar, _T("Buscar"));
+
+
+
+//	this->menuBar->Append(menuEdit,_T("Editar") );
+	addMenu(menuEdit,"Editar");
 
 	setPage(procedPanel,"primero","caption");
 	setPage(pruebaPanel,"segundo","Prueba");
@@ -69,7 +83,13 @@ void MyFrame::buildFrame(){
 
 	setPage(MensajeriaPage,"mensajes","Mensajes");
 
+	setPage(ContactosPage,"contactos","Contactos");
 
+	this->Connect( ID_Filtro, wxEVT_COMMAND_MENU_SELECTED,
+	                    (wxObjectEventFunction) &MyFrame::OnFilter );
+
+//	this->RegisterHotKey(0xAFFF,wxMOD_CONTROL,(int)'b');
+//	 this->Connect(this->GetId(),wxEVT_CHAR, wxKeyEventHandler(MyFrame::onKeyDown), NULL, this);
 // 	setPage(panelCalendar,"calendar2","Calendario 2");
 
 	

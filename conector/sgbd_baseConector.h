@@ -36,7 +36,10 @@ protected:
 	string username;
 	string pass;
 	string host;
-	string db;
+	string generalDB;
+	string userDB;
+	map<string,string> msgBlock;
+
 
 	string msgSP; // mesage Store Procedure.
 	int port;
@@ -63,5 +66,12 @@ public:/*
 	int procedure(string db, string clause);
 
 	string msgLastProcedure();
+	map<string,string> getmsgBlock();
+	string getUserDB(){
+		return userDB;
+	}
+	string getGeneralDB(){
+		return generalDB;
+	}
 };
 #endif /* SGBD_BASECONECTOR_H_ */

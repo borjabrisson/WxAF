@@ -16,6 +16,9 @@
 #include "general/mensajes/MensajeriaPage.h"
 #include "general/mensajes/MensajeriaCtr.h"
 
+#include "general/contactos/ContactosPage.h"
+#include "general/contactos/ContactosCtr.h"
+
 
 #include "general/myCtr.h"
 
@@ -45,6 +48,10 @@ public:
 	void OnClick(wxCommandEvent& event);
 	void buildFrame();
 	
+	void onKeyDown(wxKeyEvent& event){
+		cout << "yiiijaaa"<< endl;
+	}
+
 
 protected:
 	procedPanel *panelito;
@@ -57,7 +64,9 @@ enum
 {
     ID_Quit=1,
     ID_About,
-	ID_Size
+	ID_Size,
+	ID_Filtro,
+	ID_Buscar
 };
 
 #endif /* MyApp_H_ */
